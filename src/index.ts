@@ -39,5 +39,86 @@ app.listen(PORT, () => {
 
 	// CÓDIGO PARA ATENDER OS REQUERIMENTOS
 	// R01, R02, R03, R04, R05
-	
+
 });
+const fs = require('fs');
+const readline = require('readline');
+const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+
+class Cadastro {
+	nome: string;
+	idade: number;
+	nota: number;
+
+	constructor(nome: string, idade: number, nota: number) {
+		this.nome = nome;
+		this.idade = idade;
+		this.nota = nota;
+	}
+	getNota(): number {
+		return this.nota;
+	}
+};
+
+let alunos: Array<Cadastro> = [];
+
+function quantidade(): void {
+	rl.question('quantos alunos deseja cadastrar? ', (quantidadeInput: any) => {
+		const quantidade = parseInt(quantidadeInput);
+
+		let contador = 0;
+
+		function dadosAlunos(): any {
+			rl.question('Qual é seu nome? ', (nome: any) => {
+				rl.question('quantos anos tem? ', (idadeInput: any) => {
+					const idade = parseInt(idadeInput);
+					rl.question('Qual é a sua nota? ', (notaInput: any) => {
+						const nota = parseFloat(notaInput);
+						console.log('Dados cadastrados com sucesso!');
+
+						const aluno = new Cadastro(nome, idade, nota);
+						alunos.push(aluno);
+						contador++
+
+						if (contador < quantidade) {
+							dadosAlunos();
+
+						} else {
+							somaNotas();
+							gerarCSV();
+							rl.close();
+						}
+					});
+				});
+			});
+		}
+		while (contador < quantidade) {
+			dadosAlunos();
+			break;
+		}
+	});
+}
+
+function somaNotas(): any {
+	let soma = 0;
+	for (let cadastro of alunos) {
+		soma += cadastro.getNota();
+	}
+	console.log('O total da soma das notas: ', soma);
+}
+
+function gerarCSV(): void {
+	let csvCo = "Nome, Idade, Nota\n";
+
+	alunos.forEach(aluno => {
+		csvCo += `${aluno.nome}, ${aluno.idade}, ${aluno.nota}\n`;
+	});
+
+	fs.writeFileSync('alunos.csv', csvCo, 'utf8');
+	console.log('Arquivo CSV gerado com sucesso!');
+}
+
+quantidade();
