@@ -77,6 +77,11 @@ function quantidade(): void {
 					const idade = parseInt(idadeInput);
 					rl.question('Qual é a sua nota? ', (notaInput: any) => {
 						const nota = parseFloat(notaInput);
+						if (notaInput < 6){
+							console.log('Estude mais!!');
+						} else {
+							console.log('Parabéns pela boa nota!');
+						}
 						console.log('Dados cadastrados com sucesso!');
 
 						const aluno = new Cadastro(nome, idade, nota);
@@ -87,8 +92,9 @@ function quantidade(): void {
 							dadosAlunos();
 
 						} else {
-							somaNotas();
-							gerarCSV();
+							const somaTotal = somaNotas();
+							console.log('O total da soma das notas: ', somaTotal);
+							gerarCSV(somaTotal);
 							rl.close();
 						}
 					});
@@ -102,20 +108,23 @@ function quantidade(): void {
 	});
 }
 
-function somaNotas(): any {
+function somaNotas(): number {
 	let soma = 0;
 	for (let cadastro of alunos) {
 		soma += cadastro.getNota();
 	}
-	console.log('O total da soma das notas: ', soma);
+//	console.log('O total da soma das notas: ', soma);
+	return soma;
 }
 
-function gerarCSV(): void {
+function gerarCSV(somaTotal: number): void {
 	let csvCo = "Nome, Idade, Nota\n";
 
 	alunos.forEach(aluno => {
 		csvCo += `${aluno.nome}, ${aluno.idade}, ${aluno.nota}\n`;
 	});
+
+	csvCo+= `\nTotal das notas:${somaTotal}\n`;
 
 	fs.writeFileSync('alunos.csv', csvCo, 'utf8');
 	console.log('Arquivo CSV gerado com sucesso!');
